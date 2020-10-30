@@ -83,19 +83,14 @@ function ellipsis (display) {
     return ''
 }
 
+// replace placeholders 
+// in src/repo.xml.tmpl and 
+// output to build/repo.xml
 function templates () {
   return src('src/*.tmpl')
     .pipe(replace(/@(package\.)?([^@]+)@/g, tmplReplacement))
-    .pipe(rename(path => {
-        // Returns a completely new object, make sure you return all keys needed!
-        // console.log("renaming", path)
-        return {
-          dirname: path.dirname,
-          basename: path.basename,
-          extname: ""
-        };
-    }))
-    .pipe(dest('build/'));
+    .pipe(rename(path => { path.extname = "" }))
+    .pipe(dest('build/'))
 }
 
 exports.templates = templates
