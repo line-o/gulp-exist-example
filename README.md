@@ -9,8 +9,13 @@ After you pulled this repo run `npm i`
 
 ## Things you can do
 
+Assuming you have an existdb 5 running at localhost:8080
+with the default admin account. Otherwise you need to change
+the settings in `.existdb.json`.
+
 - increase the version in package.json
 - then run `gulp install`
+- run `gulp watch` and change anything in the src folder
 
 ## What else?
 
