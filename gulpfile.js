@@ -1,5 +1,7 @@
+const fs = require("fs")
 const { src, dest, watch, series, parallel, lastRun } = require('gulp')
 const { createClient } = require('@existdb/gulp-exist')
+const { connect } = require('@existdb/node-exist')
 const zip = require("gulp-zip")
 const sass = require('gulp-sass')
 const uglify = require('gulp-uglify-es').default
@@ -11,14 +13,35 @@ const pkg = require('./package.json')
 
 // read metadata from .existdb.json
 const existJSON = require('./.existdb.json')
-const connectionOptions = existJSON.servers.localhost
-const existClient = createClient({
+const serverInfo = existJSON.servers.localhost
+
+const target = serverInfo.root
+const connectionOptions = {
     basic_auth: {
-        user: connectionOptions.user, 
-        pass: connectionOptions.password
+        user: serverInfo.user, 
+        pass: serverInfo.password
+    },
+    secure: false,
+    port: 8080
+}
+const existClient = createClient(connectionOptions);
+const db = connect(connectionOptions)
+
+const packageName = () => `${existJSON.package.target}-${pkg.version}.xar`
+
+async function installXar () {
+    const file = packageName()
+    const remotePath = `/db/system/repo/${file}`
+    const buff = fs.readFileSync(file)
+    console.log("uploading...", file)
+    const uploadResult = await db.app.upload(buff, remotePath)
+    if (uploadResult !== true) {
+        return console.error(uploadResult)
     }
-});
-const target = connectionOptions.root
+    console.log("installing...", file)
+    const installationResult = await db.app.install(remotePath)
+    console.log(installationResult)
+}
 
 function clean (cb) {
     // Use the `delete` module directly, instead of using gulp-rimraf
@@ -149,7 +172,7 @@ function deploy () {
 
 function xar () {
     return src('build/**/*', {base: 'build'})
-            .pipe(zip(`${existJSON.package.target}-${pkg.version}.xar`))
+            .pipe(zip(packageName()))
             .pipe(dest('.'))
 }
 
@@ -158,6 +181,7 @@ const build = series(clean, styles, minifyEs, templates, copyStatic)
 exports.build = build
 exports.deploy = series(build, deploy)
 exports.xar = series(build, xar)
+exports.install = series(build, xar, installXar)
 
 function watchBuild () {
     watch('build/**/*', series(deploy))

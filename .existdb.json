@@ -22,7 +22,7 @@
     "package": {
         "title": "My App",
         "target": "myapp",
-        "ns": "http://myapp/1604067034743",
+        "ns": "http://myapp/",
         "type": "application",
         "finish": "",
         "prepare": "",
