@@ -1,3 +1,6 @@
+/**
+ * an example gulpfile to make ant-less existdb package builds a reality
+ */
 const fs = require("fs")
 const { src, dest, watch, series, parallel, lastRun } = require('gulp')
 const { createClient } = require('@existdb/gulp-exist')
@@ -27,35 +30,24 @@ const connectionOptions = {
 const existClient = createClient(connectionOptions);
 const db = connect(connectionOptions)
 
-const packageName = () => `${existJSON.package.target}-${pkg.version}.xar`
-
-async function installXar () {
-    const file = packageName()
-    const remotePath = `/db/system/repo/${file}`
-    const buff = fs.readFileSync(file)
-    console.log("uploading...", file)
-    const uploadResult = await db.app.upload(buff, remotePath)
-    if (uploadResult !== true) {
-        return console.error(uploadResult)
-    }
-    console.log("installing...", file)
-    const installationResult = await db.app.install(remotePath)
-    console.log(installationResult)
-}
-
+/**
+ * Use the `delete` module directly, instead of using gulp-rimraf
+ */
 function clean (cb) {
-    // Use the `delete` module directly, instead of using gulp-rimraf
     del(['build'], cb);
 }
 exports.clean = clean
 
 /**
+ * report problems in replacements in .tmpl files
+ * replaces the problematic values with an empty string
+ * 
  * @param {String} match
  * @param {String} p1 
  * @param {String} p2
  * @param {Number} offset 
  * @param {String} string 
- * @returns {String} replacement or empty string
+ * @returns {String} empty string
  */
 function handleReplacementIssue (match, offset, string, path, message) {
     const line = string.substring(0, offset).match(/\n/g).length + 1
@@ -68,10 +60,12 @@ function handleReplacementIssue (match, offset, string, path, message) {
     console.warn(`\n\x1b[31m${match}\x1b[39m ${message}`)
     console.warn(`Found at line ${line} in ${path}`)
     console.warn(`${ellipsis(startEllipsis)}${start}\x1b[31m${match}\x1b[39m${end}${ellipsis(endEllipsis)}`)
-    return "" // replace with an empty string
+    return ""
 }
 
 /**
+ * replace placeholders in the form @something@
+ * similar to your normal .tmpl substitutions
  * 
  * @param {String} match 
  * @param {String} p1 
@@ -98,24 +92,27 @@ function tmplReplacement (match, p1, p2, offset, string) {
 }
 
 /**
+ * show that the file contents were shortened
  * 
  * @param {Boolean} display 
+ * @returns {String} '...' if display is true, '' otherwise
  */
 function ellipsis (display) {
     if (display) { return '...' }
     return ''
 }
 
-// replace placeholders 
-// in src/repo.xml.tmpl and 
-// output to build/repo.xml
+/**
+ * replace placeholders 
+ * in src/repo.xml.tmpl and 
+ * output to build/repo.xml
+ */
 function templates () {
   return src('src/*.tmpl')
     .pipe(replace(/@(package\.)?([^@]+)@/g, tmplReplacement))
     .pipe(rename(path => { path.extname = "" }))
     .pipe(dest('build/'))
 }
-
 exports.templates = templates
 
 function watchTemplates () {
@@ -123,7 +120,9 @@ function watchTemplates () {
 }
 exports["watch:tmpl"] = watchTemplates
 
-// compile SCSS styles and put them into 'build/app/css'
+/**
+ * compile SCSS styles and put them into 'build/app/css'
+ */
 function styles () {
     return src('src/scss/**/*.scss')
         .pipe(sass().on('error', sass.logError))
@@ -136,7 +135,9 @@ function watchStyles () {
 }
 exports["watch:styles"] = watchStyles
 
-// compile SCSS styles and put them into 'build/app/css'
+/**
+ * minify EcmaSript files and put them into 'build/app/js'
+ */
 function minifyEs () {
     return src('src/js/**/*.js')
         .pipe(uglify())
@@ -149,9 +150,11 @@ function watchEs () {
 }
 exports["watch:es"] = watchEs
 
-const static = 'src/**/*.{xml,html,xq,xquery,xql,xqm,xsl}'
+const static = 'src/**/*.{xml,html,xq,xquery,xql,xqm,xsl,xconf}'
 
-// copy html templates, XMLs and XQuerys to 'build'
+/**
+ * copy html templates, XSL stylesheet, XMLs and XQueries to 'build'
+ */
 function copyStatic () {
     return src(static).pipe(dest('build'))
 }
@@ -162,6 +165,11 @@ function watchStatic () {
 }
 exports["watch:static"] = watchStatic
 
+/**
+ * Upload all files in the build folder to existdb.
+ * This function will only upload what was changed 
+ * since the last run (see gulp documentation for lastRun).
+ */
 function deploy () {
     return src('build/**/*', {
             base: 'build',
@@ -170,23 +178,47 @@ function deploy () {
         .pipe(existClient.dest({target}))
 }
 
-function xar () {
-    return src('build/**/*', {base: 'build'})
-            .pipe(zip(packageName()))
-            .pipe(dest('.'))
-}
-
-const build = series(clean, styles, minifyEs, templates, copyStatic)
-
-exports.build = build
-exports.deploy = series(build, deploy)
-exports.xar = series(build, xar)
-exports.install = series(build, xar, installXar)
-
 function watchBuild () {
     watch('build/**/*', series(deploy))
 }
 
+// construct the current xar name from available data
+const packageName = () => `${existJSON.package.target}-${pkg.version}.xar`
+
+/**
+ * create XAR package in repo root
+ */
+function xar () {
+    return src('build/**/*', {base: 'build'})
+        .pipe(zip(packageName()))
+        .pipe(dest('.'))
+}
+
+/**
+ * upload and install the latest built XAR
+ */
+async function installXar () {
+    const file = packageName()
+    const remotePath = `/db/system/repo/${file}`
+    const buff = fs.readFileSync(file)
+    console.log("uploading...", file)
+    const uploadResult = await db.app.upload(buff, remotePath)
+    if (uploadResult !== true) {
+        return console.error('uploading failed with: ', uploadResult)
+    }
+    console.log("installing...", file)
+    const installationResult = await db.app.install(remotePath)
+    console.log(installationResult)
+}
+
+// composed tasks
+const build = series(
+    clean,
+    styles,
+    minifyEs,
+    templates,
+    copyStatic
+)
 const watchAll = parallel(
     watchStyles,
     watchEs,
@@ -195,5 +227,12 @@ const watchAll = parallel(
     watchBuild
 )
 
+exports.build = build
 exports.watch = watchAll
+
+exports.deploy = series(build, deploy)
+exports.xar = series(build, xar)
+exports.install = series(build, xar, installXar)
+
+// main task for day to day development
 exports.default = series(build, deploy, watchAll)
