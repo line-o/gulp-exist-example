@@ -1,0 +1,6 @@
+.*
+!.gitignore
+!.existdb.json
+node_modules
+build
+*.xar

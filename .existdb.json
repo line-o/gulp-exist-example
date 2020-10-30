@@ -1,0 +1,33 @@
+{
+    "servers": {
+        "localhost": {
+            "server": "http://localhost:8080/exist",
+            "user": "admin",
+            "password": "",
+            "root": "/db/apps/myapp"
+        }
+    },
+    "sync": {
+        "server": "localhost",
+        "ignore": [
+            ".existdb.json",
+            ".git/**",
+            "components/**",
+            "node_modules/**",
+            "bower_components/**",
+            "build/**",
+            "webtest/**"
+        ]
+    },
+    "package": {
+        "title": "My App",
+        "target": "myapp",
+        "ns": "http://myapp/1604067034743",
+        "type": "application",
+        "finish": "",
+        "prepare": "",
+        "website": "",
+        "status": "beta",
+        "copyright": true
+    }
+}
