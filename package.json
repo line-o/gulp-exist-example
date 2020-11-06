@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "gulp xar"
+    "build": "gulp xar",
+    "start": "gulp install"
   },
   "main": "gulpfile.js",
   "devDependencies": {
