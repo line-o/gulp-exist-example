@@ -201,6 +201,10 @@ async function installXar () {
     const file = packageName()
     const remotePath = `/db/system/repo/${file}`
     const buff = fs.readFileSync(file)
+    // can be removed once node-exist does this by default
+    // will lead to a corrupted expath-repo otherwise
+    console.log("removing...", existJSON.package.ns)
+    console.log(await db.app.remove(existJSON.package.ns))
     console.log("uploading...", file)
     const uploadResult = await db.app.upload(buff, remotePath)
     if (uploadResult !== true) {
