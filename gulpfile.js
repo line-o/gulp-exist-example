@@ -1,10 +1,8 @@
 /**
  * an example gulpfile to make ant-less existdb package builds a reality
  */
-const fs = require("fs")
 const { src, dest, watch, series, parallel, lastRun } = require('gulp')
 const { createClient } = require('@existdb/gulp-exist')
-const { connect } = require('@existdb/node-exist')
 const zip = require("gulp-zip")
 const sass = require('gulp-sass')
 const uglify = require('gulp-uglify-es').default
@@ -16,19 +14,17 @@ const pkg = require('./package.json')
 
 // read metadata from .existdb.json
 const existJSON = require('./.existdb.json')
+const packageUri = existJSON.package.ns
 const serverInfo = existJSON.servers.localhost
-
 const target = serverInfo.root
+
 const connectionOptions = {
     basic_auth: {
         user: serverInfo.user, 
         pass: serverInfo.password
-    },
-    secure: false,
-    port: 8080
+    }
 }
 const existClient = createClient(connectionOptions);
-const db = connect(connectionOptions)
 
 /**
  * Use the `delete` module directly, instead of using gulp-rimraf
@@ -197,22 +193,9 @@ function xar () {
 /**
  * upload and install the latest built XAR
  */
-async function installXar () {
-    const file = packageName()
-    const remotePath = `/db/system/repo/${file}`
-    const buff = fs.readFileSync(file)
-    // can be removed once node-exist does this by default
-    // will lead to a corrupted expath-repo otherwise
-    console.log("removing...", existJSON.package.ns)
-    console.log(await db.app.remove(existJSON.package.ns))
-    console.log("uploading...", file)
-    const uploadResult = await db.app.upload(buff, remotePath)
-    if (uploadResult !== true) {
-        return console.error('uploading failed with: ', uploadResult)
-    }
-    console.log("installing...", file)
-    const installationResult = await db.app.install(remotePath)
-    console.log(installationResult)
+function installXar () {
+    return src(packageName())
+        .pipe(existClient.install({ packageUri }))
 }
 
 // composed tasks
