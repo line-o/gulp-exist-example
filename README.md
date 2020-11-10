@@ -13,13 +13,40 @@ Assuming you have an existdb 5 running at localhost:8080
 with the default admin account. Otherwise you need to change
 the settings in `.existdb.json`.
 
+### Testing it for the first time
+
+- run `gulp install`
+- have a look at the packagemanager of your existdb instance
 - increase the version in package.json
-- then run `gulp install`
+- then run `gulp install` again
+
+### Further down the rabbit hole
+
 - run `gulp watch` and change anything in the src folder
+- observe how SCSS is compiled, JavaScript minified and static files copied
+- after that it will immediately be synced to your database, too
 
 ## What else?
 
 `gulp --tasks` will give you an idea of gulp tasks you can try.
+
+```sh
+├── clean
+├── templates
+├── watch:tmpl
+├── styles
+├── watch:styles
+├── minify
+├── watch:es
+├── copy
+├── watch:static
+├── build
+├── watch
+├── deploy
+├── xar
+├── install
+└── default
+```
 
 ## How does it work?
 
