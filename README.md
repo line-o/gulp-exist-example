@@ -57,6 +57,6 @@ The resulting XAR can now also be installed directly from gulp (actually directl
 ## What's next?
 
 - SCSS is kind of dated, a postCSS example might be more interesting
-- refactor the template replacement into either gulp-exist or even an npm package of its own
+- [x] refactor the template replacement into either gulp-exist or even an npm package of its own
 - investigate npm initializers (think create-react-app)
 - If you have an idea what would be useful -> open an issue :)
