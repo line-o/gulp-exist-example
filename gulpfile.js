@@ -33,7 +33,7 @@ const existClient = createClient(connectionOptions);
  * Use the `delete` module directly, instead of using gulp-rimraf
  */
 function clean (cb) {
-    del(['build'], cb);
+    del(['build'], cb());
 }
 exports.clean = clean
 
