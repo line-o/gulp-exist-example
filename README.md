@@ -5,7 +5,9 @@ A completely ant-less build of a existdb application.
 
 ## Installation
 
-After you pulled this repo run `npm i`
+```bash
+npx degit line-o/gulp-exist-example#main my-new-app
+```
 
 ## Things you can do
 
@@ -58,5 +60,5 @@ The resulting XAR can now also be installed directly from gulp (actually directl
 
 - SCSS is kind of dated, a postCSS example might be more interesting
 - [x] refactor the template replacement into either gulp-exist or even an npm package of its own
-- investigate npm initializers (think create-react-app)
+- [ ] investigate npm initializers (think create-react-app)
 - If you have an idea what would be useful -> open an issue :)
