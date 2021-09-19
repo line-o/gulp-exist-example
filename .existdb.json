@@ -28,6 +28,7 @@
         "prepare": "",
         "website": "",
         "status": "beta",
-        "copyright": true
+        "copyright": true,
+        "description": "This is the description"
     }
 }
