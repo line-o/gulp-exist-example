@@ -11,12 +11,12 @@ const { createClient, readOptionsFromEnv } = require('@existdb/gulp-exist')
 const replace = require('@existdb/gulp-replace-tmpl')
 
 // read only version and license metadata from package.json
-const { version, license, author } = require('package.json')
+const { version, license, author } = require("./package.json")
 // read additional metadata from .existdb.json
-const packageMetadata = require('.existdb.json').package
+const { package } = require('./.existdb.json')
 // .tmpl replacements to include 
 // an array of objects the first definition of a key wins
-const replacements = [packageMetadata, { version, license, author }]
+const replacements = [package, { version, license, author }]
 
 /**
  * Gather connection options suitable for automated and manual testing
@@ -36,7 +36,7 @@ if (!connectionOptions.basic_auth) {
 const existClient = createClient(connectionOptions)
 
 // read metadata from .existdb.json
-const target = packageMetadata.target
+const target = package.target
 
 /**
  * Use the `delete` module directly, instead of using gulp-rimraf
@@ -126,7 +126,7 @@ function watchBuild () {
 }
 
 // construct the current xar name from available data
-const packageName = () => `${packageMetadata.target}-${version}.xar`
+const packageName = () => `${target}-${version}.xar`
 
 /**
  * create XAR package in repo root
