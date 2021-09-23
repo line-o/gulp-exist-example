@@ -5,8 +5,8 @@
   },
   "main": "gulpfile.js",
   "devDependencies": {
-    "@existdb/gulp-exist": "^4.0.0",
-    "@existdb/gulp-replace-tmpl": "^1.0.0",
+    "@existdb/gulp-exist": "^4.2.0",
+    "@existdb/gulp-replace-tmpl": "^1.0.1",
     "delete": "^1.1.0",
     "gulp": "^4.0.2",
     "gulp-rename": "^2.0.0",
@@ -17,9 +17,20 @@
   },
   "name": "gulp-exist-example",
   "version": "1.0.0",
-  "dependencies": {},
   "keywords": [],
   "author": "Juri Leino",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "app": {
+    "title": "My App",
+    "target": "myapp",
+    "ns": "http://myapp/",
+    "type": "application",
+    "finish": "",
+    "prepare": "",
+    "website": "",
+    "status": "beta",
+    "description": "This is the description",
+    "copyright": true
+  }
 }
