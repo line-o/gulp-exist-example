@@ -5,7 +5,7 @@
   },
   "main": "gulpfile.js",
   "devDependencies": {
-    "@existdb/gulp-exist": "^4.0.0",
+    "@existdb/gulp-exist": "^4.2.0",
     "@existdb/gulp-replace-tmpl": "^1.0.0",
     "delete": "^1.1.0",
     "gulp": "^4.0.2",
@@ -17,7 +17,6 @@
   },
   "name": "gulp-exist-example",
   "version": "1.0.0",
-  "dependencies": {},
   "keywords": [],
   "author": "Juri Leino",
   "license": "ISC",
