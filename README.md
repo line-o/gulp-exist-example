@@ -1,4 +1,5 @@
 # gulp-exist-example
+
 What can you achieve with gulp-exist? Have a try and find out.
 
 A completely ant-less build of a existdb application.
@@ -52,8 +53,17 @@ the settings in `.existdb.json`.
 
 ## How does it work?
 
-The `gulpfile.js` gathers data from package.json and `.existdb.json` to populate the package descriptor dynamically.
-Also the server connection is read from  `.existdb.json`.
+The `gulpfile.js` gathers metadata from package.json to populate the package descriptor dynamically. Additional 
+Also the server connection is read from environment variables. 
+
+| variable      | default value          | description
+| ----          | ----                   | ----
+|`EXIST_SERVER` | https://localhost:8443 | the URL to connect to the existdb server
+|`EXIST_USER`   | admin                  | the user to connect to the existdb server
+|`EXIST_PASS`   | _empty_                | the password for the user (must be set in order for EXIST_USER to take effect)
+
+For how to conveniently read and manage environment variables have a look at [dotenv-cli](https://www.npmjs.com/package/dotenv-cli).
+
 The resulting XAR can now also be installed directly from gulp (actually directly using one of the latest features in [node-exist](https://github.com/eXist-db/node-exist)).
 
 ## What's next?
