@@ -38,7 +38,7 @@ const tmplFiles = 'src/*.tmpl'
  */
 function templates () {
   return src(tmplFiles)
-    .pipe(replace(replacements, {debug:true}))
+    .pipe(replace(replacements, { debug: true }))
     .pipe(rename(path => { path.extname = "" }))
     .pipe(dest('build'))
 }
@@ -95,13 +95,14 @@ function watchStatic () {
 }
 exports["watch:static"] = watchStatic
 
+const allFilesInBuild = 'build/**/*'
 /**
  * Upload all files in the build folder to existdb.
  * This function will only upload what was changed 
  * since the last run (see gulp documentation for lastRun).
  */
 function deploy () {
-  return src('build/**/*', {
+  return src(allFilesInBuild, {
         base: 'build',
         since: lastRun(deploy)
     })
@@ -109,7 +110,7 @@ function deploy () {
 }
 
 function watchBuild () {
-  watch('build/**/*', deploy)
+  watch(allFilesInBuild, deploy)
 }
 
 // construct the current xar name from available data
@@ -119,7 +120,7 @@ const packageName = `${target}-${version}.xar`
  * create XAR package in repo root
  */
 function xar () {
-  return src('build/**/*', {base: 'build'})
+  return src(allFilesInBuild, {base: 'build'})
     .pipe(zip(packageName))
     .pipe(dest('dist'))
 }
