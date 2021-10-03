@@ -16,10 +16,8 @@ const replacements = [app, { version, license, author }]
 
 const target = app.target
 
-const connectionOptions = readOptionsFromEnv()
-if (!connectionOptions.basic_auth) {
-  connectionOptions.basic_auth = { user: "admin", pass: "" }
-}
+const defaultOptions = { basic_auth: { user: "admin", pass: "" } }
+const connectionOptions = Object.assign(defaultOptions, readOptionsFromEnv())
 const existClient = createClient(connectionOptions);
 
 /**
