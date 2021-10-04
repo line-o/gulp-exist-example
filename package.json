@@ -12,8 +12,6 @@
     "dotenv-cli": "^4.0.0",
     "gulp": "^4.0.2",
     "gulp-rename": "^2.0.0",
-    "gulp-sass": "^4.1.0",
-    "gulp-uglify-es": "^2.0.0",
     "gulp-zip": "^5.0.2"
   },
   "name": "gulp-exist-example",
@@ -23,10 +21,10 @@
   "license": "ISC",
   "description": "",
   "app": {
-    "title": "My App",
-    "target": "myapp",
-    "ns": "http://myapp/",
-    "type": "application",
+    "title": "My Library",
+    "target": "mylib",
+    "ns": "http://mylib/",
+    "type": "library",
     "finish": "",
     "prepare": "",
     "website": "",

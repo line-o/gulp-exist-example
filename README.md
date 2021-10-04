@@ -1,4 +1,4 @@
-# gulp-exist-example
+# gulp-exist-example (LIBRARY VERSION)
 
 What can you achieve with gulp-exist? Have a try and find out.
 
@@ -11,14 +11,14 @@ A completely ant-less build of a existdb application.
 
 ## Installation
 
-1. Create a project-folder `my-new-app` with this example in it:
+1. Create a project-folder `my-lib` with this example in it:
     ```bash
-    npx degit line-o/gulp-exist-example#main my-new-app
+    npx degit line-o/gulp-exist-example#library my-lib
     ```
 
 2. Switch to that project-folder and install the dependencies:
     ```bash
-    cd my-new-app
+    cd my-lib
     npm i
     ```
 
@@ -57,10 +57,6 @@ The scripts above will first call [dotenv](https://www.npmjs.com/package/dotenv)
 ├── clean
 ├── templates
 ├── watch:tmpl
-├── styles
-├── watch:styles
-├── minify
-├── watch:es
 ├── copy
 ├── watch:static
 ├── build

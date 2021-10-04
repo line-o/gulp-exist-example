@@ -1,11 +1,9 @@
 /**
  * an example gulpfile to make ant-less existdb package builds a reality
  */
-const { src, dest, watch, series, parallel, lastRun } = require('gulp')
+const { src, dest, watch, series, parallel } = require('gulp')
 const { createClient, readOptionsFromEnv } = require('@existdb/gulp-exist')
 const zip = require("gulp-zip")
-const sass = require('gulp-sass')
-const uglify = require('gulp-uglify-es').default
 const replace = require('@existdb/gulp-replace-tmpl')
 const rename = require('gulp-rename')
 const del = require('delete')
@@ -47,38 +45,6 @@ function watchTemplates () {
 }
 exports["watch:tmpl"] = watchTemplates
 
-const scssFiles = 'src/scss/**/*.scss'
-/**
- * compile SCSS styles and put them into 'build/app/css'
- */
-function styles () {
-  return src(scssFiles)
-    .pipe(sass().on('error', sass.logError))
-    .pipe(dest('build/css'));
-}
-exports.styles = styles
-
-function watchStyles () {
-  watch(scssFiles, styles)
-}
-exports["watch:styles"] = watchStyles
-
-const jsFiles = 'src/js/**/*.js'
-/**
- * minify EcmaSript files and put them into 'build/app/js'
- */
-function minifyEs () {
-  return src(jsFiles)
-    .pipe(uglify())
-    .pipe(dest('build/js'))
-}
-exports.minify = minifyEs
-
-function watchEs () {
-  watch(jsFiles, minifyEs)
-}
-exports["watch:es"] = watchEs
-
 const static = 'src/**/*.{xml,html,xq,xquery,xql,xqm,xsl,xconf,svg,png}'
 /**
  * copy html templates, XSL stylesheet, XMLs and XQueries to 'build'
@@ -94,34 +60,22 @@ function watchStatic () {
 exports["watch:static"] = watchStatic
 
 const allFilesInBuild = 'build/**/*'
-/**
- * Upload all files in the build folder to existdb.
- * This function will only upload what was changed 
- * since the last run (see gulp documentation for lastRun).
- */
-function deploy () {
-  return src(allFilesInBuild, {
-        base: 'build',
-        since: lastRun(deploy)
-    })
-    .pipe(existClient.dest({target}))
-}
-
-function watchBuild () {
-  watch(allFilesInBuild, deploy)
-}
-
 // construct the current xar name from available data
 const packageName = `${target}-${version}.xar`
 
 /**
- * create XAR package in repo root
+ * create XAR package in dist folder
  */
 function xar () {
   return src(allFilesInBuild, {base: 'build'})
     .pipe(zip(packageName))
     .pipe(dest('dist'))
 }
+
+function watchBuild () {
+  watch(allFilesInBuild, series(xar, installXar))
+}
+
 
 /**
  * upload and install the latest built XAR
@@ -134,14 +88,11 @@ function installXar () {
 // composed tasks
 const build = series(
   clean,
-  styles,
-  minifyEs,
   templates,
-  copyStatic
+  copyStatic,
+  xar
 )
 const watchAll = parallel(
-  watchStyles,
-  watchEs,
   watchStatic,
   watchTemplates,
   watchBuild
@@ -150,9 +101,8 @@ const watchAll = parallel(
 exports.build = build
 exports.watch = watchAll
 
-exports.deploy = series(build, deploy)
-exports.xar = series(build, xar)
-exports.install = series(build, xar, installXar)
+exports.xar = build
+exports.install = exports.deploy = series(build, installXar)
 
 // main task for day to day development
-exports.default = series(build, deploy, watchAll)
+exports.default = series(build, installXar, watchAll)
