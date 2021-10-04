@@ -1,6 +1,8 @@
+# dot files
 .*
 !.gitignore
-!.existdb.json
+
+# build folders
 node_modules
 build
-*.xar
+dist
